@@ -1,0 +1,73 @@
+﻿<Page x:Class="SalesMonthlyReport.MonthlyReport"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:SalesMonthlyReport"
+      mc:Ignorable="d" 
+      d:DesignHeight="600" d:DesignWidth="800"
+      Title="MonthlyReport">
+    <Grid Background="LightGray" ShowGridLines="False">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        <StackPanel Orientation="Horizontal" Grid.Row="0">
+        <Label Content="業務月報表" FontSize="18" FontWeight="Bold"/>
+            <StackPanel Orientation="Horizontal">
+                <Label Content="銷貨年度：" FontSize="14"></Label>
+                <Label Name="lbReportYear" Content="2016" FontSize="14"/>
+                <Label Content="銷貨月份：" FontSize="14"></Label>
+                <Label Name="lbReportMonth" Content="8" FontSize="14"/>
+                <ComboBox Name="cbMonth" Width="100" Visibility="Hidden"/>
+            </StackPanel>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Grid.Row="2" HorizontalAlignment="Left">
+            <Button Name="btnImportPo" Content="1.匯入銷貨單" Width="100" Height="40" Click="btnImportPo_Click"/>
+            <Button Name="btnImportFo" Content="2.匯入預出單" Width="100" Click="btnImportFo_Click"/>
+            <Button Name="btnExportReport" Content="3.產出月報表" Width="100" Click="btnExportReport_Click"/>
+            <Button Name="btnImportBasicData" Content="匯入基本資料" Width="100" Click="btnImportBasicData_Click" Visibility="Hidden"/>
+        </StackPanel>        
+        <StackPanel Orientation="Horizontal" Grid.Row="3">
+            <Grid Name="gridSales1" Width="380">
+                <StackPanel Orientation="Vertical">
+                    <StackPanel Orientation="Horizontal">                        
+                        <Label FontSize="14">現有客戶無責任業務：</Label>                       
+                    </StackPanel>
+                    <DataGrid Name="dgCustomerData1" Width="380" AutoGenerateColumns="False" SelectedIndex="0" CanUserSortColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="False" IsReadOnly="True">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="客戶編號" Binding="{Binding Path=Id}"></DataGridTextColumn>
+                            <DataGridTextColumn Header="客戶名稱" Width="*" Binding="{Binding Path=Name}"></DataGridTextColumn>
+                            <DataGridComboBoxColumn Header="負責業務" Width="150" x:Name="dgCbSales1" SelectedValueBinding="{Binding Sales, Mode=TwoWay}"  
+                                DisplayMemberPath="{Binding Sales}" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <Button Name="btnSave1" Width="100" Click="btnSave1_Click">_儲存設定</Button>
+                </StackPanel>
+            </Grid>
+            <Grid Name="gridSales2" Width="380">
+                <StackPanel Orientation="Vertical">
+                    <StackPanel Orientation="Horizontal">                        
+                        <Label FontSize="14">預出單無責任業務客戶：</Label>                     
+                    </StackPanel>
+                    <DataGrid Name="dgCustomerData2" Width="380" AutoGenerateColumns="False" SelectedIndex="0" CanUserSortColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="False" IsReadOnly="True">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="客戶編號" Width="*" Binding="{Binding Path=CustomerID}"></DataGridTextColumn>
+                            <DataGridTextColumn Header="客戶名稱" Width="*" Binding="{Binding Path=CustomerName}"></DataGridTextColumn>
+                            <DataGridComboBoxColumn Header="負責業務" Width="150" x:Name="dgCbSales2" SelectedValueBinding="{Binding Sales, Mode=TwoWay}"  
+                                DisplayMemberPath="{Binding Sales}" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <Button Name="btnSave2" Width="100" Click="btnSave2_Click">儲存設定</Button>
+                </StackPanel>
+            </Grid>
+        </StackPanel>
+    </Grid>  
+</Page>
