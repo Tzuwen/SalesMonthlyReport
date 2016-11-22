@@ -57,7 +57,7 @@ namespace SalesMonthlyReport
 
         private void btnAdd_Click(object sender, RoutedEventArgs e)
         {
-            if (tbSalesId.Text.Trim() != "" && tbSalesName.Text.Trim() != "")
+            if (!string.IsNullOrWhiteSpace(tbSalesId.Text.Trim()) && !string.IsNullOrWhiteSpace(tbSalesName.Text.Trim()))
             {
                 SalesBEL salesBEL = new SalesBEL();
                 salesBEL.Id = tbSalesId.Text.Trim();

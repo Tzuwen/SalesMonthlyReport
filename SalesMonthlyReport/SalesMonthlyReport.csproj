@@ -35,6 +35,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="EPPlus, Version=4.1.0.0, Culture=neutral, PublicKeyToken=ea159fdaa78159a1, processorArchitecture=MSIL">
+      <HintPath>..\packages\EPPlus.4.1.0\lib\net40\EPPlus.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Data" />
@@ -58,7 +62,9 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="AppCode\BEL\YearForecastBEL.cs" />
+    <Compile Include="AppCode\BLL\ReportsBLL.cs" />
     <Compile Include="AppCode\BLL\YearForecastBLL.cs" />
+    <Compile Include="AppCode\DAL\ReportsDAL.cs" />
     <Compile Include="AppCode\DAL\YearForecastDAL.cs" />
     <Compile Include="YearForecast.xaml.cs">
       <DependentUpon>YearForecast.xaml</DependentUpon>
@@ -123,6 +129,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
