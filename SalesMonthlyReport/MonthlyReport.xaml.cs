@@ -11,6 +11,7 @@ using SalesMonthlyReport.AppCode.BEL;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using System.IO;
+using System.Collections;
 
 namespace SalesMonthlyReport
 {
@@ -20,6 +21,8 @@ namespace SalesMonthlyReport
         {
             InitializeComponent();
             SetReportYearMonth();
+            SetCustomerDg1();
+            SetCustomerDg2();
         }
 
         private void btnImportPo_Click(object sender, RoutedEventArgs e)
@@ -102,17 +105,25 @@ namespace SalesMonthlyReport
         private void btnSave1_Click(object sender, RoutedEventArgs e)
         {
             // Update customer
+            string[] sales = null;
+            string salesId = "";
             CustomerBEL objBEL = new CustomerBEL();
-            foreach (DataRowView rowView in dgCustomerData1.Items)
+            for (int i = 0; i < dgCustomerData1.Items.Count; i++)
             {
-                if (rowView != null)
+                DataGridCell cell0 = FunctionClass.GetCell(dgCustomerData1, i, 0);
+                DataGridCell cell1 = FunctionClass.GetCell(dgCustomerData1, i, 1);
+                DataGridCell cell2 = FunctionClass.GetCell(dgCustomerData1, i, 2);
+                TextBlock tb0 = cell0.Content as TextBlock;
+                TextBlock tb1 = cell1.Content as TextBlock;
+                ComboBox cb = cell2.Content as ComboBox;
+                objBEL.Id = tb0.Text.Trim();
+                objBEL.Name = tb1.Text.Trim();
+                objBEL.CountryId = "";
+                objBEL.IsEnable = "1";
+                if (cb.SelectedValue != null)
                 {
-                    DataRow row = rowView.Row;
-                    objBEL.Id = row.ItemArray[0].ToString();
-                    objBEL.Name = row.ItemArray[1].ToString();
-                    objBEL.SalesId = (((ComboBox)row.ItemArray[2]).SelectedValue.ToString().Split('-'))[0].ToString();
-                    objBEL.CountryId = "";
-                    objBEL.IsEnable = "1";
+                    sales = cb.SelectedValue.ToString().Split('-');
+                    salesId = sales[0].ToString().Trim();
                     CustomerBLL.insertCustomer(objBEL);
                 }
             }
@@ -120,17 +131,45 @@ namespace SalesMonthlyReport
 
         private void btnSave2_Click(object sender, RoutedEventArgs e)
         {
-            // Update ForecastOrder set SalesId and CustomerId          
-            foreach (DataRowView rowView in dgCustomerData1.Items)
+            // Update ForecastOrder set SalesId and CustomerId
+            string customerId = "";
+            string customerName = "";           
+            string[] sales = null;
+            string salesId = "";
+            CustomerBEL objBEL = new CustomerBEL();
+            for (int i = 0; i< dgCustomerData2.Items.Count; i++)
             {
-                if (rowView != null)
+                DataGridCell cell0 = FunctionClass.GetCell(dgCustomerData2, i, 0);
+                DataGridCell cell1 = FunctionClass.GetCell(dgCustomerData2, i, 1);
+                DataGridCell cell2 = FunctionClass.GetCell(dgCustomerData2, i, 2);
+                TextBlock tb0 = cell0.Content as TextBlock;
+                TextBlock tb1 = cell1.Content as TextBlock;
+                ComboBox cb = cell2.Content as ComboBox;
+                customerId = tb0.Text.Trim();
+                customerName = tb1.Text.Trim();
+                if (cb.SelectedValue != null)
                 {
-                    DataRow row = rowView.Row;
-                    string salesId = (((ComboBox)row.ItemArray[2]).SelectedValue.ToString().Split('-'))[0].ToString();
-                    string customerId = row.ItemArray[0].ToString();
-                    string customerName = row.ItemArray[1].ToString();
+                    sales = cb.SelectedValue.ToString().Split('-');
+                    salesId = sales[0].ToString().Trim();
                     ForecastOrderBLL.updateForecastOrder(salesId, customerId, customerName);
+                    objBEL.Id = customerId;
+                    objBEL.Name = customerName;
+                    objBEL.CountryId = "";
+                    objBEL.IsEnable = "1";
+                    objBEL.SalesId = salesId;
+                    CustomerBLL.insertCustomer(objBEL);
                 }
+            }
+        }
+      
+        private IEnumerable<DataGridRow> getDataGridRows(DataGrid grid)
+        {
+            var itemsSource = grid.ItemsSource as IEnumerable;
+            if (null == itemsSource) yield return null;
+            foreach (var item in itemsSource)
+            {
+                var row = grid.ItemContainerGenerator.ContainerFromItem(item) as DataGridRow;                
+                if (null != row) yield return row;
             }
         }
 
@@ -192,6 +231,7 @@ namespace SalesMonthlyReport
                 // 1.Copy tmp data to real table, tmpPurchaseOrder => PurchaseOrder
                 // 2.Insert new customer, sales, product
                 PurchaseOrderBLL.updateBasicDataByPo();
+                SetCustomerDg1();
             }
             else
             {
@@ -199,6 +239,7 @@ namespace SalesMonthlyReport
                 // 1.copy tmp data to real table, tmpForecastOrder => ForecastOrder
                 // 2.insert new customer, sales
                 ForecastOrderBLL.updateBasicDataByFo();
+                SetCustomerDg2();
             }
         }
 
@@ -213,8 +254,14 @@ namespace SalesMonthlyReport
 
             var reportYear = Convert.ToInt16(lbReportYear.Content);
             var reportMonth = Convert.ToInt16(lbReportMonth.Content);
-            var startYearMonth = (reportYear - 1).ToString() + "/07";
-            var currentYearMonth = reportMonth >= 7 ? (reportYear - 1).ToString() + "/" + reportMonth.ToString() : (reportYear).ToString() + "/" + reportMonth.ToString();
+            var startYearMonth1 = (reportYear - 1).ToString() + "/07";
+            var currentYearMonth1 = reportMonth >= 7 ? (reportYear - 1).ToString() + "/" + reportMonth.ToString() : (reportYear).ToString() + "/" + reportMonth.ToString();
+
+            var startYearMonth2 = (reportYear - 2).ToString() + "/07";
+            var currentYearMonth2 = reportMonth >= 7 ? (reportYear - 2).ToString() + "/" + reportMonth.ToString() : (reportYear-1).ToString() + "/" + reportMonth.ToString();
+
+            var startYearMonth3 = (reportYear - 3).ToString() + "/07";
+            var currentYearMonth3 = reportMonth >= 7 ? (reportYear - 3).ToString() + "/" + reportMonth.ToString() : (reportYear-2).ToString() + "/" + reportMonth.ToString();
 
             // Set Title for diffrent table
             switch (type)
@@ -223,11 +270,11 @@ namespace SalesMonthlyReport
                 case "s1t3":
                     ws.Name = "年度比較"; // Setting Sheet's name
                     titles.Add("業務員");
-                    titles.Add(reportYear.ToString() + "年度" + "(" + startYearMonth + "~" + currentYearMonth + ")");
-                    titles.Add((reportYear - 1).ToString() + "年度" + "(" + startYearMonth + "~" + currentYearMonth + ")");
-                    titles.Add((reportYear - 2).ToString() + "年度" + "(" + startYearMonth + "~" + currentYearMonth + ")");
-                    titles.Add((reportYear - 1).ToString() + "." + reportYear.ToString() + "期間成長率");
-                    titles.Add((reportYear - 2).ToString() + "." + reportYear.ToString() + "期間成長率");
+                    titles.Add(reportYear.ToString() + "年度" + "(" + startYearMonth1 + "~" + currentYearMonth1 + ")");
+                    titles.Add((reportYear - 1).ToString() + "年度" + "(" + startYearMonth2 + "~" + currentYearMonth2 + ")");
+                    titles.Add((reportYear - 2).ToString() + "年度" + "(" + startYearMonth2 + "~" + currentYearMonth3 + ")");
+                    titles.Add((reportYear - 1).ToString() + "v.s" + reportYear.ToString() + "成長率");
+                    titles.Add((reportYear - 2).ToString() + "v.s" + reportYear.ToString() + "成長率");
                     if (type == "s1t1")
                     {
                         ws.Cells[startRow, 1].Value = "同期間比較(已銷+未出)";
@@ -241,7 +288,7 @@ namespace SalesMonthlyReport
                     break;
                 case "s1t2":
                     titles.Add("業務員");
-                    titles.Add("未出(累計至" + currentYearMonth + ")");
+                    titles.Add(reportYear.ToString() + "年度已銷+未出(累計至" + currentYearMonth1 + ")");
                     titles.Add((reportYear - 1).ToString() + "銷貨金額");
                     titles.Add((reportYear - 2).ToString() + "銷貨金額");
                     titles.Add(reportYear.ToString() + "達成率");
@@ -255,21 +302,21 @@ namespace SalesMonthlyReport
                     titles.Add("業務員");
                     titles.Add("客戶編號");
                     titles.Add("客戶名稱");
-                    titles.Add(reportYear.ToString() + "年度已銷(" + startYearMonth + "~" + currentYearMonth  + ")");
-                    titles.Add((reportYear-1).ToString() + "年度已銷(" + startYearMonth + "~" + currentYearMonth + ")");
-                    titles.Add((reportYear-2).ToString() + "年度已銷(" + startYearMonth + "~" + currentYearMonth + ")");
-                    titles.Add((reportYear - 1).ToString() + "." + reportYear.ToString() + "期間成長率");
-                    titles.Add(reportYear.ToString() + "年度已接未出貨");
-                    titles.Add(reportYear.ToString() + "年度已銷+未出");
-                    titles.Add((reportYear-1).ToString() + "年度已銷+未出");
-                    titles.Add((reportYear-2).ToString() + "年度已銷+未出");
-                    titles.Add((reportYear - 1).ToString() + "." + reportYear.ToString() + "期間成長率");
-                    titles.Add((reportYear - 2).ToString() + "." + reportYear.ToString() + "期間成長率");
+                    titles.Add(reportYear.ToString() + "年度已銷(" + startYearMonth1 + "~" + currentYearMonth1  + ")");
+                    titles.Add((reportYear-1).ToString() + "年度已銷(" + startYearMonth2 + "~" + currentYearMonth2 + ")");
+                    titles.Add((reportYear-2).ToString() + "年度已銷(" + startYearMonth3 + "~" + currentYearMonth3 + ")");
+                    titles.Add((reportYear - 1).ToString() + "v.s" + reportYear.ToString() + "同期成長率((D/E)-1)");
+                    titles.Add(reportYear.ToString() + "年度已接未出貨(" + reportYear.ToString() + "/06/30)");
+                    titles.Add(reportYear.ToString() + "年度已銷+未出(" + startYearMonth1 + "~" + currentYearMonth1 + ")(D+H)");
+                    titles.Add((reportYear-1).ToString() + "年度已銷+未出(" + startYearMonth2 + "~" + currentYearMonth2 + ")");
+                    titles.Add((reportYear-2).ToString() + "年度已銷+未出(" + startYearMonth3 + "~" + currentYearMonth3 + ")");
+                    titles.Add((reportYear - 1).ToString() + "v.s" + reportYear.ToString() + "成長率((I/J)-1)");
+                    titles.Add((reportYear - 2).ToString() + "v.s" + reportYear.ToString() + "成長率((I/K)-1)");
                     titles.Add((reportYear - 1).ToString() + "總銷貨額");
                     titles.Add((reportYear - 2).ToString() + "總銷貨額");                   
-                    titles.Add(reportYear.ToString() + "年度達成率");
+                    titles.Add(reportYear.ToString() + "年度達成率(I/N)");
                     titles.Add(reportYear.ToString() + "預估");
-                    titles.Add("預估與實際達成率");
+                    titles.Add("預估與實際達成率(I/Q)");
                     titles.Add(reportYear.ToString() + "/" + reportMonth.ToString() + "下單金額");
                     if (salesId != "")
                     {
@@ -410,22 +457,22 @@ namespace SalesMonthlyReport
                                 cell.Value = dt.Rows[i][j];
                                 if (j >= 2 && j <= 4)
                                 {
-                                    cell.Style.Numberformat.Format = "$#,##0.00";
+                                    cell.Style.Numberformat.Format = "$#,##0";
                                 }
                                 else if (j >= 5 && j <= 6)
                                 {
-                                    cell.Style.Numberformat.Format = "0%";
+                                    cell.Style.Numberformat.Format = "0.00%";
                                 }
                                 break;
                             case "s1t2":
                                 cell.Value = dt.Rows[i][j];
                                 if (j >= 2 && j <= 4 || j == 6)
                                 {
-                                    cell.Style.Numberformat.Format = "$#,##0.00";
+                                    cell.Style.Numberformat.Format = "$#,##0";
                                 }
                                 else if (j == 5 || j == 7)
                                 {
-                                    cell.Style.Numberformat.Format = "0%";
+                                    cell.Style.Numberformat.Format = "0.00%";
                                 }
                                 break;
                             case "s2":
@@ -439,11 +486,11 @@ namespace SalesMonthlyReport
                                 }
                                 if (j >= 4 && j <= 6 || j >= 8 && j <= 11 || j >= 14 && j <= 15 || j == 17 || j == 19)
                                 {
-                                    cell.Style.Numberformat.Format = "$#,##0.00";
+                                    cell.Style.Numberformat.Format = "$#,##0";
                                 }
                                 else if (j == 7 || j >= 12 && j <= 13 || j == 16 || j == 18)
                                 {
-                                    cell.Style.Numberformat.Format = "0%";
+                                    cell.Style.Numberformat.Format = "0.00%";
                                 }
                                 break;
                             case "s3":
@@ -457,7 +504,7 @@ namespace SalesMonthlyReport
                                 }
                                 if (j >= 4)
                                 {
-                                    cell.Style.Numberformat.Format = "$#,##0.00";
+                                    cell.Style.Numberformat.Format = "$#,##0";
                                 }
                                 break;
                         }
@@ -556,7 +603,7 @@ namespace SalesMonthlyReport
             DataTable dt = ForecastOrderBLL.getCustomerWithNoSalesFo();
             if (dt.Rows.Count != 0)
             {
-                dgCustomerData1.ItemsSource = dt.DefaultView;
+                dgCustomerData2.ItemsSource = dt.DefaultView;
 
                 // Set sales dropdown in datagrid
                 dt = SalesBLL.getSalesAll();
@@ -588,6 +635,8 @@ namespace SalesMonthlyReport
             }
             return saveFile;
         }
+
+      
 
         // 以下匯入初始資料用 //
         private void btnImportBasicData_Click(object sender, RoutedEventArgs e)

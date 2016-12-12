@@ -41,7 +41,7 @@
                     <StackPanel Orientation="Horizontal">                        
                         <Label FontSize="14">現有客戶無責任業務：</Label>                       
                     </StackPanel>
-                    <DataGrid Name="dgCustomerData1" Width="380" AutoGenerateColumns="False" SelectedIndex="0" CanUserSortColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="False" IsReadOnly="True">
+                    <DataGrid Name="dgCustomerData1" Width="380" AutoGenerateColumns="False" SelectedIndex="0" CanUserSortColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="False" IsReadOnly="False">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="客戶編號" Binding="{Binding Path=Id}"></DataGridTextColumn>
                             <DataGridTextColumn Header="客戶名稱" Width="*" Binding="{Binding Path=Name}"></DataGridTextColumn>
@@ -57,7 +57,7 @@
                     <StackPanel Orientation="Horizontal">                        
                         <Label FontSize="14">預出單無責任業務客戶：</Label>                     
                     </StackPanel>
-                    <DataGrid Name="dgCustomerData2" Width="380" AutoGenerateColumns="False" SelectedIndex="0" CanUserSortColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="False" IsReadOnly="True">
+                    <DataGrid Name="dgCustomerData2" Width="380" AutoGenerateColumns="False" SelectedIndex="0" CanUserSortColumns="False" CanUserReorderColumns="False" CanUserResizeColumns="False" IsReadOnly="False">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="客戶編號" Width="*" Binding="{Binding Path=CustomerID}"></DataGridTextColumn>
                             <DataGridTextColumn Header="客戶名稱" Width="*" Binding="{Binding Path=CustomerName}"></DataGridTextColumn>

@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using SalesMonthlyReport.AppCode.BLL;
 using SalesMonthlyReport.AppCode.BEL;
+using SalesMonthlyReport.AppCode;
 
 namespace SalesMonthlyReport
 {
@@ -56,17 +57,20 @@ namespace SalesMonthlyReport
             try
             {
                 YearForecastBEL objBEL = new YearForecastBEL();
-                foreach (DataRowView rowView in dgCustomerDatai1.Items)
+                for (int i = 0; i < dgCustomerDatai1.Items.Count; i++)
                 {
-                    if (rowView != null)
-                    {
-                        DataRow row = rowView.Row;
-                        objBEL.CustomerId = row.ItemArray[0].ToString();
-                        objBEL.Forecast = Convert.ToDecimal(row.ItemArray[2].ToString());
-                        objBEL.Year = cbYear.SelectedValue.ToString();
-                        YearForecastBLL.insertCustomer(objBEL);
-                    }
+                    DataGridCell cell0 = FunctionClass.GetCell(dgCustomerDatai1, i, 0);                   
+                    DataGridCell cell2 = FunctionClass.GetCell(dgCustomerDatai1, i, 2);
+                    TextBlock tb0 = cell0.Content as TextBlock;
+                    TextBlock tb1 = cell2.Content as TextBlock;
+                    string customerId = tb0.Text.Trim();
+                    string forecast = tb1.Text.Trim() == "" ? "0" : tb1.Text.Trim();                    
+                    objBEL.CustomerId = tb0.Text.Trim();
+                    objBEL.Forecast = Convert.ToDecimal(tb1.Text.Trim());
+                    objBEL.Year = cbYear.SelectedValue.ToString();
+                    YearForecastBLL.insertCustomer(objBEL);                    
                 }
+               
                 System.Windows.Forms.MessageBox.Show("設定完畢", "Message");
             }
             catch
